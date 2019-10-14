@@ -3,6 +3,7 @@
 use Hyperf\Database\Schema\Schema;
 use Hyperf\Database\Schema\Blueprint;
 use Hyperf\Database\Migrations\Migration;
+use Hyperf\DbConnection\Db;
 
 class CreateApiAuthClientTable extends Migration
 {
@@ -18,6 +19,7 @@ class CreateApiAuthClientTable extends Migration
             $table->tinyInteger('status')->nullable()->default('1')->comment('状态[-1:删除;0:禁用;1启用]');
             $table->timestamps();
         });
+        DB::statement("ALTER TABLE tb_api_auth_client COMMENT='api-授权表'");
     }
 
     /**

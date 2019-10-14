@@ -3,6 +3,7 @@
 use Hyperf\Database\Schema\Schema;
 use Hyperf\Database\Schema\Blueprint;
 use Hyperf\Database\Migrations\Migration;
+use Hyperf\DbConnection\Db;
 
 class CreateUsersTable extends Migration
 {
@@ -44,6 +45,7 @@ class CreateUsersTable extends Migration
             $table->index('mobile');
             $table->index('uuid');
         });
+        DB::statement("ALTER TABLE tb_users COMMENT='用户表'");
     }
 
     /**

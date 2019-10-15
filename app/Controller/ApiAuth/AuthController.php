@@ -9,9 +9,9 @@ use App\Constants\StatusCode;
 use App\Kernel\ResponseCreater;
 use App\Lib\JsonWebToken;
 use App\Service\ApiAuthClientService;
+use App\Service\QueueService;
 use App\Request\ApiAuthLoginRequest;
 use Hyperf\Di\Annotation\Inject;
-
 use Hyperf\HttpServer\Contract\ResponseInterface;
 
 /**
@@ -21,6 +21,20 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
  */
 class AuthController extends AbstractController
 {
+    /**
+     * 通过 `@Inject` 注解注入由 `@var` 注解声明的属性类型对象
+     *
+     * @Inject
+     * @var ResponseCreater
+     */
+    private $responseCreater;
+    /**
+     * 通过 `@Inject` 注解注入由 `@var` 注解声明的属性类型对象
+     *
+     * @Inject
+     * @var QueueService
+     */
+    private $queueService;
     /**
      * 通过 `@Inject` 注解注入由 `@var` 注解声明的属性类型对象
      *
@@ -41,13 +55,13 @@ class AuthController extends AbstractController
         //登录验证
         $user = $this->apiAuthClientService->login($validated['app_id'], $validated['app_secret']);
         if ($user === false) {
-            return ResponseCreater::error($response, StatusCode::AccountPasswordInvalid);
+            return $this->responseCreater->error($request,$response, StatusCode::AccountPasswordInvalid);
         }
         $data = [
             'access_token' => JsonWebToken::getToken(['app_id' => $validated['app_id'], 'app_secret' => $validated['app_secret']]),
             'expire_in' => config('jwt.exp'),
         ];
-        return ResponseCreater::success($response, $data);
+        return $this->responseCreater->success($request,$response, $data);
     }
 
 

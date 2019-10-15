@@ -6,8 +6,10 @@ namespace App\Middleware\Auth;
 use App\Constants\StatusCode;
 use App\Kernel\ResponseCreater;
 use App\Lib\JsonWebToken;
+use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface as HttpResponse;
+
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,6 +18,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class AuthMiddleware implements MiddlewareInterface
 {
+    /**
+     * 通过 `@Inject` 注解注入由 `@var` 注解声明的属性类型对象
+     *
+     * @Inject
+     * @var ResponseCreater
+     */
+    private $responseCreater;
     /**
      * @var ContainerInterface
      */
@@ -43,7 +52,7 @@ class AuthMiddleware implements MiddlewareInterface
         //判断白名单
         $ip = $request->getHeader('x-real-ip')[0];   // 获取IP
         if (!in_array($ip, config('whitelist.ip'))) {
-            return ResponseCreater::error($this->response, StatusCode::Forbidden);
+            return $this->responseCreater->error($this->request,$this->response, StatusCode::Forbidden);
         }
         // 根据具体业务判断逻辑走向，这里假设用户携带的token有效
         $token = $request->getHeader('Authorization')[0] ?? '';
@@ -56,6 +65,6 @@ class AuthMiddleware implements MiddlewareInterface
                 return $handler->handle($request);
             }
         }
-        return ResponseCreater::error($this->response, StatusCode::Console_Connect_TokenInvalid, $jwt['msg'], ['errmsg' => $jwt['error']]);
+        return $this->responseCreater->error($this->request,$this->response, StatusCode::Console_Connect_TokenInvalid, $jwt['msg'], ['errmsg' => $jwt['error']]);
     }
 }

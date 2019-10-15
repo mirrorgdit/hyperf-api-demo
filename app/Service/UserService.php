@@ -86,6 +86,19 @@ class UserService
     }
 
     /**
+     *用户列表
+     * @return array|null
+     */
+    public function list()
+    {
+        $user = User::select('uuid', 'username', 'nickname', 'realname', 'head_portrait', 'gender', 'gender', 'qq', 'email', 'birthday', 'mobile')->paginate(10);
+        if ($user) {
+            return $user->toArray();
+        }
+        return null;
+    }
+
+    /**
      * @CacheEvict(prefix="user", value="#{uuid}")
      *
      * 更新信息，更新后主动清理缓存 保证最新信息输出

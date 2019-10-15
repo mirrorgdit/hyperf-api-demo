@@ -32,7 +32,9 @@ class QueueService
         // 同理，如果内部使用了注解 @Value 会把对应对象一起序列化，导致消息体变大。
         // 所以这里也不推荐使用 `make` 方法来创建 `Job` 对象。
         if ($type == 0) {
-            return $this->driver->push(new EmailJob($params), $delay);
+            $jobParams['email'] =$params['data']['email'];
+            $jobParams['nickname'] =$params['data']['nickname'];
+            return $this->driver->push(new EmailJob($jobParams), $delay);
         } else {
             return $this->driver->push(new LogRecordJob($params), $delay);
 

@@ -65,6 +65,6 @@ class AuthMiddleware implements MiddlewareInterface
                 return $handler->handle($request);
             }
         }
-        return $this->responseCreater->error($this->request,$this->response, StatusCode::Console_Connect_TokenInvalid, $jwt['msg'], ['errmsg' => $jwt['error']]);
+        return $this->responseCreater->error($this->request,$this->response, StatusCode::Console_Connect_TokenInvalid, $jwt['msg']??StatusCode::Console_Connect_TokenInvalid, ['errmsg' => $jwt['error']??StatusCode::getMessage(StatusCode::Console_Connect_TokenInvalid)]);
     }
 }

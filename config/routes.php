@@ -29,4 +29,6 @@ Router::addGroup('/api/', function () {
     Router::post('user-info', 'App\Controller\User\UserController@info');
     //用户信息更新
     Router::post('user-update', 'App\Controller\User\UserController@updateInfo');
+    //用户列表
+    Router::post('user-list', 'App\Controller\User\UserController@list');
 }, ['middleware' => [AuthMiddleware::class]]);

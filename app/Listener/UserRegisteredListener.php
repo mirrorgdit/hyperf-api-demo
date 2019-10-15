@@ -25,6 +25,6 @@ class UserRegisteredListener implements ListenerInterface
         // 直接访问 $event 的 user 属性获得事件触发时传递的参数值
         //$event->user;
         //异步队列 延迟发
-        $event->queueService->push($event->user, 0,2);
+        $event->queueService->push($event->getUser(), 0,2);
     }
 }

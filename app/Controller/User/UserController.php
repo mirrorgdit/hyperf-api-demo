@@ -72,9 +72,9 @@ class UserController extends AbstractController
         //登录验证
         $user = $this->userService->login($validated['username'], $validated['password']);
         if ($user === false) {
-            return $this->responseCreater->error($request,$response, StatusCode::AccountPasswordInvalid);
+            return $this->responseCreater->error($request, $response, StatusCode::AccountPasswordInvalid);
         }
-        return $this->responseCreater->success($request,$response, ['uid' => $user['uuid']], StatusCode::getMessage(StatusCode::Success));
+        return $this->responseCreater->success($request, $response, ['uid' => $user['uuid']], StatusCode::getMessage(StatusCode::Success));
     }
 
     /**
@@ -91,12 +91,12 @@ class UserController extends AbstractController
         $user = $this->userService->register($validated);
 
         if ($user['code'] == '-1') {
-            return $this->responseCreater->error($request,$response, StatusCode::ServerError);
+            return $this->responseCreater->error($request, $response, StatusCode::ServerError);
         }
         // 完成账号注册的逻辑
         // 这里 dispatch(object $event) 会逐个运行监听该事件的监听器 监听器注册成功 触发发注册成功的邮件
         $this->eventDispatcher->dispatch(new UserRegistered($user, $this->queueService));
-        return $this->responseCreater->success($response, ['uid' => $user['data']['uuid']], StatusCode::getMessage(StatusCode::Success));
+        return $this->responseCreater->success($request,$response, ['uid' => $user['data']['uuid']], StatusCode::getMessage(StatusCode::Success));
     }
 
     /**
@@ -110,10 +110,10 @@ class UserController extends AbstractController
         $validator = $this->validationFactory->make($request->all(), ['id' => 'required|digits:17'], ['id.required' => '缺乏必填参数', 'id.digits' => '非法参数']);
         if ($validator->fails()) {
             $errorMessage = $validator->errors()->first();
-            return $this->responseCreater->error($request,$response, StatusCode::AccountPasswordInvalid, $errorMessage);
+            return $this->responseCreater->error($request, $response, StatusCode::AccountPasswordInvalid, $errorMessage);
         }
         $user = $this->userService->info($request->all()['id']);
-        return $this->responseCreater->success($request,$response, $user, StatusCode::getMessage(StatusCode::Success));
+        return $this->responseCreater->success($request, $response, $user, StatusCode::getMessage(StatusCode::Success));
     }
 
     /**
@@ -130,13 +130,30 @@ class UserController extends AbstractController
 
         $user = User::query()->where('uuid', $uuid)->first();
         if ($user === null) {
-            return ResponseCreater::error($request,$response, StatusCode::AccountPasswordInvalid, '无效的用户');
+            return ResponseCreater::error($request, $response, StatusCode::AccountPasswordInvalid, '无效的用户');
         }
         //更新
         $user = $this->userService->doUpdate($validated);
         if ($user['code'] == '-1') {
-            return ResponseCreater::error($request,$response, StatusCode::ServerError);
+            return ResponseCreater::error($request, $response, StatusCode::ServerError);
         }
-        return ResponseCreater::success($request,$response, [], StatusCode::getMessage(StatusCode::Success));
+        return ResponseCreater::success($request, $response, [], StatusCode::getMessage(StatusCode::Success));
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function list(RequestInterface $request, ResponseInterface $response)
+    {
+        //验证参数
+        $validator = $this->validationFactory->make($request->all(), ['page' => 'numeric'], ['page.numeric' => '非法参数']);
+        if ($validator->fails()) {
+            $errorMessage = $validator->errors()->first();
+            return $this->responseCreater->error($request, $response, StatusCode::ParamaterInvalid, $errorMessage);
+        }
+        $user = $this->userService->list();
+        return $this->responseCreater->success($request, $response, $user, StatusCode::getMessage(StatusCode::Success));
     }
 }

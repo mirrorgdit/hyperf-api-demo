@@ -13,4 +13,21 @@ class UserRegistered
         $this->user = $user;
         $this->queueService = $queueService;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQueueService()
+    {
+        return $this->queueService;
+    }
+
 }
